@@ -24,6 +24,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     final static int LINE = 1, CIRCLE = 2, RECTANGLE = 3;
     static int curShape = LINE;
+    static int curColor = Color.RED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     public static class Line extends Shape {
         int startX, startY, stopX, stopY;
 
-        public Line(int startX, int startY, int stopX, int stopY, int color){
+        public Line(int startX, int startY, int stopX, int stopY, int color) {
             super(color);
             this.startX = startX;
             this.startY = startY;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     public static class Circle extends Shape {
         int centerX, centerY, radius;
 
-        public Circle(int centerX, int centerY, int radius, int color){
+        public Circle(int centerX, int centerY, int radius, int color) {
             super(color);
             this.centerX = centerX;
             this.centerY = centerY;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     public static class Rectangle extends Shape {
         int left, top, right, bottom;
 
-        public Rectangle(int left, int top, int right, int bottom, int color){
+        public Rectangle(int left, int top, int right, int bottom, int color) {
             super(color);
             this.left = left;
             this.top = top;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             paint.setColor(this.color);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(left, top, right, bottom, paint);
+        }
     }
 
 
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         public MyGraphicView(Context context) {
             super(context);
 
-            Paint paint = new Paint();
+            paint = new Paint();
             paint.setAntiAlias(true);
             paint.setStrokeWidth(5);
             paint.setStyle(Paint.Style.STROKE);
@@ -155,17 +157,17 @@ public class MainActivity extends AppCompatActivity {
                     Shape newShape = null;
                     switch (curShape) {
                         case LINE:
-                            newShape = new Line(currentStartX, currentStartY, currentStopX, currentStopY, Color.RED);
+                            newShape = new Line(currentStartX, currentStartY, currentStopX, currentStopY, curColor);
                             break;
                         case CIRCLE:
-                            newShape = new Circle(currentStartX, currentStartY, (int) Math.sqrt(Math.pow(currentStopX - currentStartX, 2) + Math.pow(currentStopY - currentStartY, 2)), Color.RED);
+                            newShape = new Circle(currentStartX, currentStartY, (int) Math.sqrt(Math.pow(currentStopX - currentStartX, 2) + Math.pow(currentStopY - currentStartY, 2)), curColor);
                             break;
                         case RECTANGLE:
-                            newShape = new Rectangle(currentStartX, currentStartY, currentStopX, currentStopY, Color.RED);
+                            newShape = new Rectangle(currentStartX, currentStartY, currentStopX, currentStopY, curColor);
                             break;
                     }
 
-                    if (newShape != null){
+                    if (newShape != null) {
                         shapes.add(newShape);
                     }
 
@@ -184,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (isDrawing && currentStartX != -1) {
-                paint.setColor(Color.RED);
+                paint.setColor(curColor);
                 paint.setStyle(Paint.Style.STROKE);
 
                 switch (curShape) {
@@ -208,21 +210,40 @@ public class MainActivity extends AppCompatActivity {
         menu.add(0, 1, 0, "선 추가");
         menu.add(0, 2, 0, "원 추가");
         menu.add(0, 3, 0, "사각형 추가");
+
+        Menu subMenu = menu.addSubMenu("색상 변경");
+        subMenu.add(1, 4, 0, "빨간색").setCheckable(true);
+        subMenu.add(1, 5, 0, "파란색").setCheckable(true);
+        subMenu.add(1, 6, 0, "초록색").setCheckable(true);
+        subMenu.setGroupCheckable(1, true, true);
+
+        subMenu.getItem(0).setChecked(true);
+
         return true;
     }
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
-            case 1:
-                curShape = LINE;
-                return true;
-            case 2:
-                curShape = CIRCLE;
-                return true;
-            case 3:
-                curShape = RECTANGLE;
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        if (itemId == LINE || itemId == CIRCLE || itemId == RECTANGLE) {
+            curShape = itemId;
+            return true;
+        } else if (itemId >= 4 && itemId <= 6) {
+            switch (itemId) {
+                case 4:
+                    curColor = Color.RED;
+                    break;
+                case 5:
+                    curColor = Color.BLUE;
+                    break;
+                case 6:
+                    curColor = Color.GREEN;
+                    break;
+            }
+            item.setChecked(true);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
